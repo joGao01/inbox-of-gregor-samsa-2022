@@ -8,7 +8,7 @@ So I went into the repo and quickly fixed that. Phew, crisis averted. The fact t
 
 However, in the process of doing this, I accidentally uncovered something that I had long forgotten about: the horrors of my early Javascript code. It's hard to articulate all the things that were wrong with it, so I'm just going to leave this screenshot here:
 
-[Insert a pic once i push all of this to github]
+![image](https://user-images.githubusercontent.com/36776982/171504354-3bf1edf9-c538-4d70-99c5-d3f1cb9b7071.png)
 
 Yea.
 
