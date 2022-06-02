@@ -1,5 +1,5 @@
 <script>
-
+	
 </script>
 
 <div id="container">
@@ -8,11 +8,22 @@
 			<img alt="bmail logo"/>
 		</div>
 
-		<div id="search-box">
-			<input type="text">
-			<button></button>
+		<div id="top-bar-cont">
+			<div class="bar"></div>
 		</div>
 	</header>
+
+	<main>
+		<h1>Server Error</h1>
+		<p>Looks like you've encountered a bug</p>
+		<p>No worries though! Our team is probably already looking into the issue.</p>
+		<a href="/#Inbox/all" class="link">Back to Inbox</a>
+	</main>
+
+	<footer>
+		<div class="bar"></div>
+	</footer>
+	
 </div>
 
 <style>
@@ -26,7 +37,6 @@
 @media (min-width: 801px) {
 	#container {
 		max-width: 1500px;
-		width: fit-content;
 	}
 }
 
@@ -35,10 +45,29 @@
 	font-size: 16px;
 }
 
-header {
+header,
+footer {
 	display: flex;
 	flex-flow: row nowrap;
 	min-height: 125px;
+}
+
+#logo-box {
+	display: grid;
+	align-items: center;
+	padding-left: 8px;
+
+	width: 170px;
+	min-width: 170px;
+	max-width: 170px;
+}
+
+@media (max-width: 600px) { 
+	#logo-box {
+		width: 100px;
+		min-width: 100px;
+		max-width: 100px;
+	}
 }
 
 @media (min-width: 601px) {
@@ -51,5 +80,26 @@ header {
 	#logo-box img {
 		content: url('../assets/short-logo.svg');
 	}
+}
+
+#top-bar-cont {
+	width: 100%;
+	display: grid;
+	align-items: center;
+}
+
+main {
+	padding: 20px 8px;
+}
+
+.bar {
+	background-color: #C3D9FF;
+	height: 25px;
+	width: 100%;
+}
+
+footer {
+	display: grid;
+	align-items: center;
 }
 </style>

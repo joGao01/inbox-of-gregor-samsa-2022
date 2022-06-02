@@ -35,8 +35,14 @@ export const inbox = writable([]);
 export let currentPage = writable('');
 export let currentSort = writable('');
 
-export let bannerOpen = writable(true);
-export let landingOpen = writable(true);
+// localStorage can only hold strings so u gotta JSON.parse them back into booleans
+export let bannerClosed = writable(
+  localStorage.getItem('bannerClosed') ? JSON.parse(localStorage.getItem('bannerClosed')) : false
+);
+
+export let landingOpen = writable(
+  localStorage.getItem('landingOpen') ? JSON.parse(localStorage.getItem('landingOpen')) : true
+);
 
 const emailManager = {
   Inbox: new EmailList(inboxEmails),

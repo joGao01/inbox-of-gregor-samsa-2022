@@ -1,6 +1,6 @@
 <script>
-	import {push, pop, replace} from 'svelte-spa-router';
-	import { currentPage, currentSort, inbox, landingOpen, bannerOpen } from './stores.js';
+	import { push } from 'svelte-spa-router';
+	import { currentPage, currentSort, inbox, landingOpen, bannerClosed } from './stores.js';
 	import Email from './components/email.svelte';
 	import Modal from './components/modal.svelte';
 
@@ -31,23 +31,40 @@
 		Best, 
 		Grete`
 	}
+
+	// changed values get saved to localStorage
+	$: localStorage.setItem('landingOpen', $landingOpen);
+	$: localStorage.setItem('bannerClosed', $bannerClosed);
+
+	console.log($bannerClosed);
+
+	const resetInbox = () => {
+		$landingOpen = true;
+		$bannerClosed = false;
+	}
 </script>
 
 <div id="container">
 
-	<div id="info-banner" class:hidden={!$bannerOpen}>
-		This inbox has been archived as of 09/01/19. Emails can no longer be sent out.
-		<button on:click={()=>{$bannerOpen=!$bannerOpen}}>Understood</button>
+	<div id="info-banner" class="{$bannerClosed ? 'hidden' : 'shown'}">
+		<span>
+			This inbox has been archived as of 09/01/19. Emails can no longer be sent out.
+		</span>
+		<button class="outset" on:click={()=>{$bannerClosed=!$bannerClosed}}>Ok</button>
 	</div>
 
 	<header>
 		<div id="logo-box">
-			<img alt="bmail logo"/>
+			<div on:click={()=>{window.location.href='#Inbox/all'}}>
+				<img alt="bmail logo"/>
+			</div>
 		</div>
 
 		<div id="search-box">
-			<input type="text">
-			<button on:click={()=>{push('/bug')}}></button>
+			<form>
+				<input name="query" type="text">
+				<button type="submit" class="outset" on:click={()=>{push('/bug')}}></button>
+			</form>
 		</div>
 	</header>
 
@@ -83,7 +100,7 @@
 				<p>Use the search bar to find messages quickly!</p>
 				<p>You are currently using  247 MB (3%) of your 7063 MB.</p>
 				<p>Last Account Activity: 30 days | <span class="link" on:click={()=>{$landingOpen=!$landingOpen}}>Details</span></p>
-				<p>Powered by <a class="link" href="https://jogao.weebly.com/" target="_blank">me</a></p>
+				<p>Powered by <a class="link" href="https://jogao.weebly.com/" target="_blank">me</a> | <span class="link" on:click={resetInbox}>Reset</span></p>
 			</footer>
 		</div>
 	</div>
@@ -116,9 +133,28 @@
 	top: 0;
 	left: 0;
 	width: 100%;
-	padding: 5px;
+	padding: 0 5px;
 	background-color: #FFFECD;
 	border-bottom: 1px solid #FFE600;
+}
+
+#info-banner span {
+	margin-top: 9px;
+	margin-right: 5px;
+}
+
+@media (max-width: 600px) {
+	#info-banner span {
+		overflow-x: scroll;
+		white-space: nowrap;
+	}
+
+	/* hides scrollbar on narrow screens, assumes the user is using a touchscreen but alas this could be a problem for devices that are both non-touchscreen and narrow */
+	::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; 
+		display: none;
+	}
 }
 
 #info-banner button {
@@ -127,6 +163,12 @@
 
 .hidden {
 	display: none;
+}
+
+.shown {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: center;
 }
 
 header {
@@ -170,18 +212,21 @@ nav,
 @media (min-width: 601px) {
 	#logo-box img {
 		content: url('../assets/full-logo.svg');
+		cursor: pointer;
 	}
 }
 
 @media (max-width: 600px) {
 	#logo-box img {
-		content: url('../assets/short-logo.svg');
+		content: url('../assets/short-logo.svg');cursor: pointer;
 	}
 }
 
-#search-box {
+#search-box,
+#search-box form {
 	display: flex;
 	width: 100%;
+	align-items: center;
 }
 
 #search-box input,
@@ -197,7 +242,7 @@ nav,
 	height: 32px;
 	margin-right: 10px;
 	background-color: white;
-	box-shadow: inset 1px 1px 1px 1px #888;
+	box-shadow: inset 1px 1px 1px 1px rgba(136, 136, 136, 0.5);
 }
 
 #search-box button {
@@ -206,12 +251,14 @@ nav,
 
 	font-size: 16px;
 
-	box-shadow: inset -1px -1px 1px 1px #888;
-
 	cursor: pointer;
 
 	display: grid;
 	justify-content: center;
+}
+
+.outset {
+	box-shadow: inset -1px -1px 1px 1px #888;
 }
 
 #search-box button:before {

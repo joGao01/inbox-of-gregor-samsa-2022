@@ -152,8 +152,9 @@
   border: 1px solid #8C8C8C;
   background-color: white;
   max-width: 740px;
-  box-shadow: inset 1px 1px 1px 1px #888;
+  box-shadow: inset 1px 1px 1px 1px rgba(136, 136, 136, 0.25);
   cursor: not-allowed;
+  resize: none;
 }
 
 #footer span {
