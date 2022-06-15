@@ -1,8 +1,8 @@
 # Inbox of Gregor Samsa (2022)
 
-This is a remake of a project I originally did in 2019 for an art class.
+This is a [remake](https://inbox-of-gregor-samsa-2022.vercel.app) of a project I originally did in 2019 for an art class.
 
-It all started because I was getting ready to apply to TikTok. I was looking over some of my stuff, and I realized, "_Yikes! The README for this project is still in unformatted plaintext!_" (Bro, 2019 was a dark time. I had just learned Javascript in my art class. I had never heard of markdown.)
+It all started because I was getting ready to apply to TikTok. I was looking over some of my stuff, and I realized, "_Yikes! The README for this project is still in unformatted plaintext!_" (2019 was a dark time. I had just learned Javascript in my art class. I had never heard of markdown.)
 
 So I went into the repo and quickly fixed that. Phew, crisis averted. The fact that I wouldn't perceive markdown until my senior year in college would, henceforth, stay between me and God<sup>1</sup>.
 
