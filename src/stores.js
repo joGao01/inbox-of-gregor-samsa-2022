@@ -1,4 +1,7 @@
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
+import { location, push, pop, replace } from 'svelte-spa-router';
+
+// import all emails but overwrite them if local storage exists
 import { inboxEmails } from './emails/inboxEmails';
 import { sentEmails } from './emails/sentEmails';
 import { draftEmails } from './emails/draftEmails';
@@ -6,34 +9,39 @@ import { spamEmails } from './emails/spamEmails';
 import { archivedEmails } from './emails/archivedEmails';
 import { trashEmails } from './emails/trashEmails';
 
-import { push, pop, replace } from 'svelte-spa-router';
-
 class EmailList {
   // list of emails
-  list;
+  storeList;
 
   constructor(list) {
-    this.list = list;
+    this.storeList = writable(list);
   }
 
   get read() {
-    return this.list.filter((email) => email.read);
+    return get(this.storeList).filter((email) => email.read);
   }
 
   get unread() {
-    return this.list.filter((email) => !email.read);
+    return get(this.storeList).filter((email) => !email.read);
   }
 
   get starred() {
-    return this.list.filter((email) => email.starred);
+    return get(this.storeList).filter((email) => email.starred);
+  }
+
+  get list() {
+    return get(this.storeList);
+  }
+
+  markAllUnread() {
+    for (let email of get(this.storeList)) {
+      email.read = false;
+    }
   }
 }
 
 // holds the list of emails to display
 export const inbox = writable([]);
-
-export let currentPage = writable('');
-export let currentSort = writable('');
 
 // localStorage can only hold strings so u gotta JSON.parse them back into booleans
 export let bannerClosed = writable(
@@ -44,50 +52,107 @@ export let landingOpen = writable(
   localStorage.getItem('landingOpen') ? JSON.parse(localStorage.getItem('landingOpen')) : true
 );
 
-const emailManager = {
-  Inbox: new EmailList(inboxEmails),
-  Starred: new EmailList(inboxEmails.filter((email) => email.starred)),
-  Sent: new EmailList(sentEmails),
-  Drafts: new EmailList(draftEmails),
-  Archived: new EmailList(archivedEmails),
-  Spam: new EmailList(spamEmails),
-  Trash: new EmailList(trashEmails),
+const groups = ['Inbox', 'Sent', 'Drafts', 'Spam', 'Archived', 'Trash'];
+let emailManager;
+
+if (!localStorage.getItem('Inbox')) {
+  // just for the sake of iteration
+  const allEmails = [inboxEmails, sentEmails, draftEmails, spamEmails, archivedEmails, trashEmails];
+
+  for (let [index, rawList] of allEmails.entries()) {
+    for (let email of rawList) {
+      email.group = index; // equivalent to the index of name in group
+    }
+
+    // put list in local storage
+    localStorage.setItem(groups[index], JSON.stringify(rawList));
+  }
+
+  emailManager = {
+    Inbox: new EmailList(inboxEmails),
+    Starred: new EmailList(inboxEmails.filter((email) => email.starred)),
+    Sent: new EmailList(sentEmails),
+    Drafts: new EmailList(draftEmails),
+    Archived: new EmailList(archivedEmails),
+    Spam: new EmailList(spamEmails),
+    Trash: new EmailList(trashEmails),
+  };
+} else {
+  const inboxEmailsStorage = JSON.parse(localStorage.getItem('Inbox'));
+  const sentEmailsStorage = JSON.parse(localStorage.getItem('Sent'));
+  const draftEmailsStorage = JSON.parse(localStorage.getItem('Drafts'));
+  const spamEmailsStorage = JSON.parse(localStorage.getItem('Spam'));
+  const archivedEmailsStorage = JSON.parse(localStorage.getItem('Archived'));
+  const trashEmailsStorage = JSON.parse(localStorage.getItem('Trash'));
+
+  console.log(inboxEmailsStorage);
+  emailManager = {
+    Inbox: new EmailList(inboxEmailsStorage),
+    Starred: new EmailList(inboxEmailsStorage.filter((email) => email.starred)),
+    Sent: new EmailList(sentEmailsStorage),
+    Drafts: new EmailList(draftEmailsStorage),
+    Archived: new EmailList(archivedEmailsStorage),
+    Spam: new EmailList(spamEmailsStorage),
+    Trash: new EmailList(trashEmailsStorage),
+  };
+}
+
+// pushs current list into localStorage
+export const updateList = (group) => {
+  console.log('updating group');
+  localStorage.setItem(groups[group], JSON.stringify(emailManager[groups[group]].list));
 };
 
-// inbox routing
-const routeSite = () => {
-  const route = window.location.hash.substring(1).split('/');
+export const resetInbox = () => {
+  bannerClosed.update((value) => false);
+  landingOpen.update((value) => true);
 
-  if (route.includes('bug')) {
-    push('/bug');
+  for (let emailListObj in emailManager) {
+    if (emailListObj !== 'Starred') {
+      emailManager[emailListObj].markAllUnread();
+      localStorage.setItem(emailListObj, JSON.stringify(emailManager[emailListObj].list));
+      routeSite();
+    }
+  }
+};
+
+/************************ ROUTING ***************************/
+export let currentPage = writable('');
+export let currentSort = writable('');
+
+const routeSite = () => {
+  console.log(get(location));
+
+  if (get(location) == '/bug') {
     currentPage.set('bug');
     return;
   }
 
-  currentPage.set(route[0]);
-  currentSort.set(route[1]);
+  const [page, sort] = window.location.hash.substring(1).split('/');
+
+  currentPage.set(page);
+  currentSort.set(sort);
 
   let emailList;
 
-  switch (route[1]) {
+  switch (sort) {
     case 'all':
-      emailList = emailManager[route[0]].list;
+      emailList = emailManager[page].list;
       break;
     case 'read':
-      emailList = emailManager[route[0]].read;
+      emailList = emailManager[page].read;
       break;
     case 'unread':
-      emailList = emailManager[route[0]].unread;
+      emailList = emailManager[page].unread;
       break;
     default:
-      emailList = emailManager[route[0]].list;
+      emailList = emailManager[page].list;
   }
   inbox.set(emailList);
 };
 
 // init stuff
 if (!window.location.hash) {
-  console.log('no hash found');
   window.location.hash = '#Inbox/all';
 }
 routeSite();
