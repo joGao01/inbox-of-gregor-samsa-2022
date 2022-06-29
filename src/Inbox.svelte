@@ -1,6 +1,6 @@
 <script>
 	import { push } from 'svelte-spa-router';
-	import { currentPage, currentSort, inbox, landingOpen, bannerClosed } from './stores.js';
+	import { currentPage, currentSort, inbox, landingOpen, bannerClosed, resetInbox } from './stores.js';
 	import Email from './components/email.svelte';
 	import Modal from './components/modal.svelte';
 
@@ -36,11 +36,11 @@
 	$: localStorage.setItem('landingOpen', $landingOpen);
 	$: localStorage.setItem('bannerClosed', $bannerClosed);
 
-	console.log($bannerClosed);
-
-	const resetInbox = () => {
-		$landingOpen = true;
-		$bannerClosed = false;
+	const submitSearch = (e) => {
+		e.preventDefault();
+		if (e.target[0].value){
+			push(`/bug?query=${e.target[0].value}`);
+		}
 	}
 </script>
 
@@ -61,9 +61,9 @@
 		</div>
 
 		<div id="search-box">
-			<form>
+			<form on:submit={submitSearch}>
 				<input name="query" type="text">
-				<button type="submit" class="outset" on:click={()=>{push('/bug')}}></button>
+				<button type="submit" class="outset" ></button>
 			</form>
 		</div>
 	</header>

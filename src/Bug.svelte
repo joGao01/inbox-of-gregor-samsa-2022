@@ -1,11 +1,18 @@
 <script>
-	
+	import {querystring} from 'svelte-spa-router'
+	console.log($querystring);
+	const params = new Proxy(new URLSearchParams($querystring), {
+  	get: (searchParams, prop) => searchParams.get(prop),
+	});
+
+	let query = params.query; // "some_value"
+
 </script>
 
 <div id="container">
 	<header>
 		<div id="logo-box">
-			<img alt="bmail logo"/>
+			<a href="/#Inbox/all"><img alt="bmail logo"/></a>
 		</div>
 
 		<div id="top-bar-cont">
@@ -14,8 +21,8 @@
 	</header>
 
 	<main>
-		<h1>Server Error</h1>
-		<p>Looks like you've encountered a bug</p>
+		<h1>Server Error Encountered</h1>
+		<p>Looks like you've encountered a bug while searching for: {query}</p>
 		<p>No worries though! Our team is probably already looking into the issue.</p>
 		<a href="/#Inbox/all" class="link">Back to Inbox</a>
 	</main>

@@ -4,7 +4,9 @@
   */
 
   import Modal from './modal.svelte';
+  import { updateList } from '../stores';
 
+  export let group;
   export let senderEmail;
   export let to;
   export let toemail;
@@ -18,7 +20,10 @@
   let reading = false;
 
   const readEmail = () => {
-    if (!read) read = true;
+    if (!read) {
+      read = true;
+      updateList(group);
+    }
     reading = !reading;
   }
 
